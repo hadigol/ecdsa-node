@@ -15,7 +15,7 @@ function Wallet({ address, setAddress, balance, setBalance, privateKey, setPriva
     tmp = keccak256.keccak256(tmp);
     tmp = toHex.toHex(tmp.slice(tmp.length-20));
     console.log("address:",tmp);
-    const address =setAddress(tmp);
+    const address = tmp;
     setAddress(address);
 
     if (address) {
@@ -38,7 +38,7 @@ function Wallet({ address, setAddress, balance, setBalance, privateKey, setPriva
       </label>
 
       <div>
-        Wallet Address: {address}
+        Address: {address}
       </div>
 
       <div className="balance">Balance: {balance}</div>
