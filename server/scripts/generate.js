@@ -18,3 +18,4 @@ console.log("Private Key: ", toHex(privateKey));
 console.log("Public Key:", toHex(publicKey));
 console.log("Wallet:", toHex(wallAddress));
 
+

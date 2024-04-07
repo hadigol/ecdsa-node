@@ -33,12 +33,12 @@ function Wallet({ address, setAddress, balance, setBalance, privateKey, setPriva
       <h1>Your Wallet</h1>
 
       <label>
-        Wallet Address
+        Private Key of Sender:
         <input placeholder="Type your private key" value={privateKey} onChange={onChange}></input>
       </label>
 
       <div>
-        Address: {address}
+        Wallet Address of Sender: {address}
       </div>
 
       <div className="balance">Balance: {balance}</div>

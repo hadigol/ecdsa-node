@@ -1,3 +1,8 @@
+const { secp256k1 } = require("ethereum-cryptography/secp256k1");
+const { utf8ToBytes } = require("ethereum-cryptography/utils");
+const { toHex } = require("ethereum-cryptography/utils");
+const { keccak256 } = require("ethereum-cryptography/keccak");
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -7,9 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 const balances = {
-  "adee2d504b65e04c2d87d0965c31d1f62858b7ba": 100,
-  "4ed7a2bf32dc676ae0adf78afebda6aa8f7787d5": 50,
-  "ff4343228c441c56b15159f3730bc53566782330": 75,
+  "63a1ab5ff8bd9515c653192efcca2d1d02f1c352": 100,
+  "4c4092d91316c36c8ece9eaf8700738dceaf70cb": 50,
+  "3c61ce36546da956f0bd7e90aba379c2b4734599": 75,
 };
 
 app.get("/balance/:address", (req, res) => {
@@ -19,8 +24,19 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
-
+  const { transaction, signature, recoveryBit } = req.body;
+  
+  const hashTransaction = keccak256(utf8ToBytes(transaction));
+  let jsonSignature = JSON.parse(signature);
+  const construcSign = new secp256k1.Signature(BigInt(jsonSignature.r), BigInt(jsonSignature.s), jsonSignature.recovery)
+  const recoveredPublicKey = construcSign.recoverPublicKey(hashTransaction);
+  const verified = secp256k1.verify(construcSign, hashTransaction, recoveredPublicKey.toHex());
+  let jsonTransaction = JSON.parse(transaction);
+  const sender = jsonTransaction.sender;
+  const recipient = jsonTransaction.recipient;
+  const amount = parseInt(jsonTransaction.amount);
+  console.log("verified", verified);
+  if (verified){
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
@@ -31,6 +47,9 @@ app.post("/send", (req, res) => {
     balances[recipient] += amount;
     res.send({ balance: balances[sender] });
   }
+}else{
+  res.status(400).send({ message: "Message secuirty Failure" });
+}
 });
 
 app.listen(port, () => {
